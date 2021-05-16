@@ -26,4 +26,9 @@ public class Open_Menu : MonoBehaviour {
 		Anim_Btn.SetTrigger("Close_btn");
 		Anim_Config.SetTrigger("Open_Config");
 	}
+
+	public void Switch_Food_Menu()
+    {
+
+    }
 }

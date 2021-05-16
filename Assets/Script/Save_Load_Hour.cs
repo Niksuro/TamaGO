@@ -77,6 +77,7 @@ public class Save_Load_Hour : MonoBehaviour {
 			//
 
 			Debug.Log("Now = D: " + Now.Day + ", H: " + Now.Hour + ", M: " + Now.Minute + ", S: " + Now.Second);
+			Debug.Log("LAST" + Last);
 			//Calculate the diference between the saved time and the atual time
 			System.TimeSpan Diferencia = Now - Last;	
 			System.TimeSpan DiferenciaCom = Now - ultimaCom;		
@@ -101,7 +102,8 @@ public class Save_Load_Hour : MonoBehaviour {
 	}	
 	
 	void OnApplicationQuit()
-    {		
+    {
+		Debug.Log("Quited");
 		System.DateTime Now = System.DateTime.Now;			
 		//Reset Now
 		PlayerPrefs.SetInt("A_Desc",Now.Year);
@@ -115,7 +117,8 @@ public class Save_Load_Hour : MonoBehaviour {
 	}
 	void OnApplicationPause(bool pauseStatus)
     {
-		if (pauseStatus) {			
+		if (pauseStatus) {
+			Debug.Log("Paused");
 			System.DateTime Now = System.DateTime.Now;			
 			//Reset Now
 			PlayerPrefs.SetInt("A_Desc",Now.Year);
@@ -130,7 +133,8 @@ public class Save_Load_Hour : MonoBehaviour {
 	}
 	void OnApplicationFocus(bool focusStatus)
     {
-		if (focusStatus) {			
+		Debug.Log("Focused " + focusStatus);
+		if (!focusStatus) {			
 			System.DateTime Now = System.DateTime.Now;			
 			//Reset Now
 			PlayerPrefs.SetInt("A_Desc",Now.Year);
@@ -141,9 +145,14 @@ public class Save_Load_Hour : MonoBehaviour {
 			PlayerPrefs.SetInt("S_Desc",Now.Second);	
 			PlayerPrefs.SetInt("dormirEnCama",0);			
 			CS.Sueño();
-		}       
+        }
+        else
+        {
+			Start();
+        }       
 	}
 	public void Sleep () {
+		CS.Sueño();
 		SceneManager.LoadScene("sleepScene");
 	}
 	public void Reset()

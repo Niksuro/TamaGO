@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class DragHandler : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler
 {
-    public GameObject itemDragging;
+    public static GameObject itemDragging;
     //https://www.youtube.com/watch?v=WBSNrqM707Y
 
     Vector3 startPosition;
@@ -28,8 +28,8 @@ public class DragHandler : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
-        Debug.Log("POSICION MOUSE X" + Input.mousePosition.x);
-        Debug.Log("POSICION MOUSE Y" + Input.mousePosition.y);
+        //Debug.Log("POSICION MOUSE X" + Input.mousePosition.x);
+        //Debug.Log("POSICION MOUSE Y" + Input.mousePosition.y);
     }
     public void OnEndDrag(PointerEventData eventData)
     {
