@@ -8,8 +8,8 @@ public class Change_States : MonoBehaviour {
 
 	int contComida=5, contBaño=5, contAseo=5, contSalud=100, contSueño=1, contFelicidad=100;
 	int tempComida, tempBaño, tempAseo, tempFelicidad, tempSueño;
-	//en Minutos
-	int promedioComida = 9000, promedioBaño = 10800, promedioAseo = 21600, promedioSueño=20;
+	//en Minutos (LineaBasica: int promedioComida = 9000, promedioBaño = 10800, promedioAseo = 21600, promedioSueño=20;)
+	int promedioComida = 10, promedioBaño = 20, promedioAseo = 30, promedioSueño=20;
 	bool AnimationState = false;
 	public GameObject ic_Comida, ic_Baño, ic_Aseo, ic_Felicidad, ic_Sueño, ic_Salud, ic_Alerta;
 	public Sprite C_5,C_4,C_3,C_2,C_1;
