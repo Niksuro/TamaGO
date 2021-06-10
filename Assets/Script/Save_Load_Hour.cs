@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Save_Load_Hour : MonoBehaviour {
 
-	public GameObject Label,Edad;
+	public GameObject Label,Edad, name, specimen;
 	Change_States CS;
 	// Use this for initialization
 	void Start () {	
@@ -18,6 +18,8 @@ public class Save_Load_Hour : MonoBehaviour {
 		//Debug.Log("travelTime: " + travelTime );  
 		
 		int Inicio = PlayerPrefs.GetInt("Inicios");
+		name.GetComponent<Text>().text = PlayerPrefs.GetString("namePet");
+		specimen.GetComponent<Text>().text = PlayerPrefs.GetString("specimenPet");
 		if (Inicio == 0)
 		{
 			Debug.Log("Inicio por primera vez");
@@ -50,8 +52,9 @@ public class Save_Load_Hour : MonoBehaviour {
 			PlayerPrefs.SetInt("Mi_rA",reinicio.Minute);
 			//
 			Label.GetComponent<Text>().text = "Primer inicio"; 
-			Edad.GetComponent<Text>().text = "Edad: 0 horas";
-		}else{
+			Edad.GetComponent<Text>().text = "Edad: 0 horas";			
+		}
+		else{
 			Debug.Log("Ya inicio una vez");
 			//Load Last Desconnection
 			System.DateTime Last = new System.DateTime(  PlayerPrefs.GetInt("A_Desc"), 
