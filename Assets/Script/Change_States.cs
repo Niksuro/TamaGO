@@ -6,328 +6,294 @@ using UnityEngine.UI;
 
 public class Change_States : MonoBehaviour {
 
-	int contComida=5, contBaño=5, contAseo=5, contSalud=100, contSueño=1, contFelicidad=100;
-	int tempComida, tempBaño, tempAseo, tempFelicidad, tempSueño;
-	//en Minutos (LineaBasica: int promedioComida = 9000, promedioBaño = 10800, promedioAseo = 21600, promedioSueño=20;)
-	int promedioComida = 9000, promedioBaño = 10800, promedioAseo = 21600, promedioSueño=20;
+	int contComida=5, contAnimo=5, contAseo=5, contSalud=50, contSueño=1, contFelicidad=50;
+	int tempComida, tempAnimo, tempAseo, tempFelicidad, tempSueño;
+	//en Minutos (LineaBasica: int promedioComida = 9000, promedioAnimo = 10800, promedioAseo = 21600, promedioSueño=900;)
+	int promedioComida = 20, promedioAnimo = 10800, promedioAseo = 21600, promedioSueño = 10;
 	bool AnimationState = false;
-	public GameObject ic_Comida, ic_Baño, ic_Aseo, ic_Felicidad, ic_Sueño, ic_Salud, ic_Alerta;
+	public GameObject ic_Comida, ic_Animo, ic_Aseo, ic_Felicidad, ic_Sueño, ic_Salud, ic_Alerta, txt_Alerta, alertTaste;
 	public Sprite C_5,C_4,C_3,C_2,C_1;
-	Animator Alerta;
+	Animator Alerta, Anim_Alert, Anim_AlertTaste;
 
 	void Awake()
 	{
 		Alerta = ic_Alerta.GetComponent<Animator>();
+		Anim_Alert = txt_Alerta.GetComponent<Animator>();
+		Anim_AlertTaste = alertTaste.GetComponent<Animator>();
 	}
+
 	void Alertar()
 	{		
-		if ((contComida == 1 || contBaño == 1 || contAseo == 1 || contSueño == 1) && !AnimationState)
+		if ((contComida == 1 || contAnimo == 1 || contAseo == 1 || contSueño == 1) && !AnimationState)
 		{			
 			Alerta.SetTrigger("Open");	
-			Debug.Log("Entro a True");
 			AnimationState = true;		
 		}
-		if (contComida > 1 && contBaño > 1 && contAseo > 1 && contSueño > 1 && AnimationState) {			
+		if (contComida > 1 && contAnimo > 1 && contAseo > 1 && contSueño > 1 && AnimationState) {			
 			Alerta.SetTrigger("Open");
-			Debug.Log("Entro a False");
 			AnimationState = false;
 		}
 	}
-	public void calcularComida()
+
+	public void UpdateBasics(int comida, int animo, int aseo, int sueño, int salud, int felicidad)
+    {
+		contComida = comida;
+		contAnimo = animo;
+		contAseo = aseo;
+		contSueño = sueño;
+		contSalud = salud;
+		contFelicidad = felicidad;
+    }
+
+	public void SaveBasics()
+    {
+		PlayerPrefs.SetInt("contComida", contComida);
+		PlayerPrefs.SetInt("contAnimo", contAnimo);
+		PlayerPrefs.SetInt("contAseo", contAseo);
+		PlayerPrefs.SetInt("contSueño", contSueño);
+		PlayerPrefs.SetInt("contSalud", contSalud);
+		PlayerPrefs.SetInt("contFelicidad", contFelicidad);
+	}
+
+	public void calcularComida(System.TimeSpan tiempoEntre)
 	{
-		System.DateTime ultima = new System.DateTime( PlayerPrefs.GetInt("A_rC"), 
-													  PlayerPrefs.GetInt("Me_rC"),
-													  PlayerPrefs.GetInt("D_rC"),
-													  PlayerPrefs.GetInt("H_rC"),
-													  PlayerPrefs.GetInt("Mi_rC"),
-													  0);
-		System.DateTime Now = System.DateTime.Now;
-		System.TimeSpan tiempoEntre = Now - ultima;
 		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / promedioComida);	
-		if(restarContador>4){
-			restarContador=4;
-		}	
 		contComida-= restarContador;
+		if(contComida < 1)
+        {
+			CalcularFelicidad(contComida, "Comida");
+			CalcularSalud(contComida, "Comida");
+			contComida = 1;
+        }
 		int restarTemporizador = Mathf.RoundToInt((float)tiempoEntre.TotalSeconds);		
 		while(restarTemporizador > 0) {
 			restarTemporizador-=promedioComida;
 		}
 		tempComida = (restarTemporizador + promedioComida) ;		
-		ChangeComida();
+		ChangeSpriteComida();
 		StartCoroutine(WaitComida());
 	}
 
-	public void calcularBaño()
-	{		
-		System.DateTime ultima = new System.DateTime( PlayerPrefs.GetInt("A_rB"), 
-													  PlayerPrefs.GetInt("Me_rB"),
-													  PlayerPrefs.GetInt("D_rB"),
-													  PlayerPrefs.GetInt("H_rB"),
-													  PlayerPrefs.GetInt("Mi_rB"),
-													  0);
-		System.DateTime Now = System.DateTime.Now;
-		System.TimeSpan tiempoEntre = Now - ultima;
-		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / promedioBaño);
-		if(restarContador>4){
-			restarContador=4;
-		}
-		contBaño-= restarContador;
+	public void calcularAnimo(System.TimeSpan tiempoEntre)
+	{				
+		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / promedioAnimo);		
+		contAnimo-= restarContador;
+		if(contAnimo < 1)
+        {
+			CalcularFelicidad(contAnimo, "Juego");
+			CalcularSalud(contAnimo, "Juego");
+			contAnimo = 1;
+        }
 		int restarTemporizador = Mathf.RoundToInt((float)tiempoEntre.TotalSeconds);
 		while(restarTemporizador > 0) {
-			restarTemporizador-=promedioBaño;
+			restarTemporizador-=promedioAnimo;
 		}
-		tempBaño = (restarTemporizador + promedioBaño);
-		//Debug.Log("restarContador " + restarContador);
-		//Debug.Log("restarTemporizador " + restarTemporizador);
-		//Debug.Log("tempBaño " + tempBaño);
-		ChangeBaño();
-		StartCoroutine(WaitBaño());
+		tempAnimo = (restarTemporizador + promedioAnimo);
+		ChangeSpriteAnimo();
+		StartCoroutine(WaitAnimo());
 	}
 
-	public void calcularAseo()
+	public void calcularAseo(System.TimeSpan tiempoEntre)
 	{
-		System.DateTime ultima = new System.DateTime( PlayerPrefs.GetInt("A_rA"), 
-													  PlayerPrefs.GetInt("Me_rA"),
-													  PlayerPrefs.GetInt("D_rA"),
-													  PlayerPrefs.GetInt("H_rA"),
-													  PlayerPrefs.GetInt("Mi_rA"),
-													  0);
-		System.DateTime Now = System.DateTime.Now;
-		System.TimeSpan tiempoEntre = Now - ultima;
-		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / promedioAseo);
-		if(restarContador>4){
-			restarContador=4;
-		}
+		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / promedioAseo);		
 		contAseo-= restarContador;
+        if (contAseo < 1)
+        {
+			CalcularFelicidad(contAseo, "Aseo");
+			CalcularSalud(contAseo, "Aseo");
+			contAseo = 1;
+        }
 		int restarTemporizador = Mathf.RoundToInt((float)tiempoEntre.TotalSeconds);
 		while(restarTemporizador > 0) {
 			restarTemporizador-=promedioAseo;
 		}
 		tempAseo = (restarTemporizador + promedioAseo);
-		ChangeAseo();
+		ChangeSpriteAseo();
 		StartCoroutine(WaitAseo());
 	}
 
-	public void calcularSueño()
+	public void calcularSueño(System.TimeSpan tiempoEntre)
 	{
-		contSueño = PlayerPrefs.GetInt("Sueño");
-		Debug.Log("contSueño: " + contSueño);
-		Debug.Log("PlayerPrefSueño: " + PlayerPrefs.GetInt("Sueño"));
-		System.DateTime ultima = new System.DateTime( PlayerPrefs.GetInt("A_Desc"), 
-													  PlayerPrefs.GetInt("Me_Desc"),
-													  PlayerPrefs.GetInt("D_Desc"),
-													  PlayerPrefs.GetInt("H_Desc"),
-													  PlayerPrefs.GetInt("Mi_Desc"),
-													  PlayerPrefs.GetInt("S_Desc"));
-		System.DateTime Now = System.DateTime.Now;
-		System.TimeSpan tiempoEntre = Now - ultima;
 		int multiplicadorSueño = 1;
 		if (PlayerPrefs.GetInt("dormirEnCama") == 1)
 		{
 			multiplicadorSueño = 10;
-			Debug.Log("Si durmio en la cama");
 		}
 		int restarContador = Mathf.RoundToInt((float)(tiempoEntre.TotalSeconds) / (promedioSueño/multiplicadorSueño));		
 		contSueño+= restarContador;
-		Debug.Log("restarContador: " + restarContador);
 		if(contSueño>5){
 			contSueño=5;
 		}
 		tempSueño = promedioSueño;
-		Debug.Log("Post-contSueño: " + contSueño);
-		ChangeSueño();
-		StartCoroutine(WaitSueño());
+		ChangeSpriteSueño();
+		//StartCoroutine(WaitSueño());
 	}
 
-	public void Sueño()
-	{
-		Debug.Log("Entro a guardar el sueño de" + contSueño);
-		PlayerPrefs.SetInt("Sueño",contSueño);
+	public void CalcularFelicidad(int modifier, string selection)
+    {
+		Debug.Log("MODIFIER en " + selection +": " + modifier.ToString());
+		Debug.Log("FELICIDAD INICIAL: " + contFelicidad);
+		switch (selection)
+        {
+			case "Comida":
+				contFelicidad += (modifier * 2);
+				break;
+			case "Aseo":
+				contFelicidad += (modifier * 2);
+				break;
+			case "Juego":
+				contFelicidad += (modifier * 3);
+				break;
+		}
+		LimitFelicidad();
+		Debug.Log("FELICIDAD FINAL: " + contFelicidad);
+    }
+
+	public void CalcularSalud(int modifier, string selection)
+    {
+		switch (selection)
+		{
+			case "Comida":
+				contSalud -= (modifier * modifier);
+				break;
+			case "Aseo":
+				contSalud += (modifier * 2);
+				break;
+			case "Felicidad":
+				contSalud += modifier;
+				break;
+		}
+		LimitSalud();
 	}
 
-	void reFillComida()
-	{
-		contComida=5;
-		ChangeComida();
-		System.DateTime reinicio = System.DateTime.Now;
-			PlayerPrefs.SetInt("A_rC",reinicio.Year);
-			PlayerPrefs.SetInt("Me_rC",reinicio.Month);
-			PlayerPrefs.SetInt("D_rC",reinicio.Day);
-			PlayerPrefs.SetInt("H_rC",reinicio.Hour);
-			PlayerPrefs.SetInt("Mi_rC",reinicio.Minute);
-			ChangeComida();
-		ChangeFelicidad();
-		Alertar();
-	}
-	void reFillBaño()
-	{
-		contBaño=5;
-		System.DateTime reinicio = System.DateTime.Now;
-			PlayerPrefs.SetInt("A_rB",reinicio.Year);
-			PlayerPrefs.SetInt("Me_rB",reinicio.Month);
-			PlayerPrefs.SetInt("D_rB",reinicio.Day);
-			PlayerPrefs.SetInt("H_rB",reinicio.Hour);
-			PlayerPrefs.SetInt("Mi_rB",reinicio.Minute);
-			ChangeBaño();
-		ChangeFelicidad();
-		Alertar();
-	}
-	void reFillAseo()
-	{
-		contAseo=5;
-		System.DateTime reinicio = System.DateTime.Now;
-			PlayerPrefs.SetInt("A_rA",reinicio.Year);
-			PlayerPrefs.SetInt("Me_rA",reinicio.Month);
-			PlayerPrefs.SetInt("D_rA",reinicio.Day);
-			PlayerPrefs.SetInt("H_rA",reinicio.Hour);
-			PlayerPrefs.SetInt("Mi_rA",reinicio.Minute);
-			ChangeAseo();
-		ChangeFelicidad();
-		Alertar();
+	void HappinessUp(int happiness)
+    {
+		contFelicidad += happiness;
+    }
+
+	void Heal(int heal)
+    {
+		Debug.Log("SALUDPre: " + contSalud);
+		contSalud += heal;
+		Debug.Log("SALUDPost: " + contSalud);
 	}
 
-	void ChangeComida()
+	public void SaveMoment()
+	{
+		System.DateTime reinicio = System.DateTime.Now;
+		PlayerPrefs.SetInt("A_rB", reinicio.Year);
+		PlayerPrefs.SetInt("Me_rB", reinicio.Month);
+		PlayerPrefs.SetInt("D_rB", reinicio.Day);
+		PlayerPrefs.SetInt("H_rB", reinicio.Hour);
+		PlayerPrefs.SetInt("Mi_rB", reinicio.Minute);
+	}	
+
+	void ChangeSpriteComida()
 	{
 		switch (contComida)
 		{
 			case 5:
 				ic_Comida.GetComponent<Image>().sprite = C_5;
-				contSalud+=25;
 				break;
 			case 4:
 				ic_Comida.GetComponent<Image>().sprite = C_4;
-				contFelicidad-=4;
 				break;
 			case 3:
 				ic_Comida.GetComponent<Image>().sprite = C_3;
-				contFelicidad-=6;
 				break;
 			case 2:
 				ic_Comida.GetComponent<Image>().sprite = C_2;
-				contFelicidad-=9;				
 				break;
 			case 1:
 				ic_Comida.GetComponent<Image>().sprite = C_1;
-				contFelicidad-=14;
-				contSalud-=4;
 				Alertar();
-				if(contFelicidad<0)
-				{
-					contFelicidad=0;
-				}
 				break;
 		}
-		ChangeFelicidad();
+		ChangeSpriteFelicidad();
 	}
 
-	void ChangeBaño()
+	void ChangeSpriteAnimo()
 	{
-		switch (contBaño)
+		switch (contAnimo)
 		{
 			case 5:
-				ic_Baño.GetComponent<Image>().sprite = C_5;
-				contSalud+=25;
+				ic_Animo.GetComponent<Image>().sprite = C_5;
 				break;
 			case 4:
-				ic_Baño.GetComponent<Image>().sprite = C_4;
-				contFelicidad-=4;
+				ic_Animo.GetComponent<Image>().sprite = C_4;
 				break;
 			case 3:
-				ic_Baño.GetComponent<Image>().sprite = C_3;
-				contFelicidad-=5;
+				ic_Animo.GetComponent<Image>().sprite = C_3;
 				break;
 			case 2:
-				ic_Baño.GetComponent<Image>().sprite = C_2;
-				contFelicidad-=9;
+				ic_Animo.GetComponent<Image>().sprite = C_2;
 				break;
 			case 1:
-				ic_Baño.GetComponent<Image>().sprite = C_1;
-				contFelicidad-=14;
-				contSalud-=4;
+				ic_Animo.GetComponent<Image>().sprite = C_1;
 				Alertar();
-				if(contFelicidad<0)
-				{
-					contFelicidad=0;
-				}
 				break;
 		}
-		ChangeFelicidad();
+		ChangeSpriteFelicidad();
 	}
 
-	void ChangeAseo()
+	void ChangeSpriteAseo()
 	{
 		switch (contAseo)
 		{
 			case 5:
 				ic_Aseo.GetComponent<Image>().sprite = C_5;
-				contSalud+=25;
 				break;
 			case 4:
 				ic_Aseo.GetComponent<Image>().sprite = C_4;
-				contFelicidad-=4;
 				break;
 			case 3:
 				ic_Aseo.GetComponent<Image>().sprite = C_3;
-				contFelicidad-=6;
 				break;
 			case 2:
 				ic_Aseo.GetComponent<Image>().sprite = C_2;
-				contFelicidad-=9;
 				break;
 			case 1:
 				ic_Aseo.GetComponent<Image>().sprite = C_1;
-				contFelicidad-=14;
-				contSalud-=4;
 				Alertar();
-				if(contFelicidad<0)
-				{
-					contFelicidad=0;
-				}
 				break;
 		}
-		ChangeFelicidad();
+		ChangeSpriteFelicidad();
 	}
 
-	void ChangeSueño()
+	void ChangeSpriteSueño()
 	{
 		switch (contSueño)
 		{
 			case 5:
 				ic_Sueño.GetComponent<Image>().sprite = C_5;
-				contSalud+=25;
 				break;
 			case 4:
 				ic_Sueño.GetComponent<Image>().sprite = C_4;
-				contFelicidad-=4;
 				break;
 			case 3:
 				ic_Sueño.GetComponent<Image>().sprite = C_3;
-				contFelicidad-=6;
 				break;
 			case 2:
 				ic_Sueño.GetComponent<Image>().sprite = C_2;
-				contFelicidad-=9;
 				break;
 			case 1:
 				ic_Sueño.GetComponent<Image>().sprite = C_1;
 				Alertar();
-				contFelicidad-=14;
-				contSalud-=4;
-				if(contFelicidad<0)
-				{
-					contFelicidad=0;
-				}
+				break;
+			default:
+				ic_Sueño.GetComponent<Image>().sprite = C_1;
+				Alertar();
 				break;
 		}
-		ChangeFelicidad();
+		ChangeSpriteFelicidad();
 	}
 
-	void ChangeFelicidad()
+	void ChangeSpriteFelicidad()
 	{
+		LimitFelicidad();
 		if (contFelicidad>90)
 		{
 			ic_Felicidad.GetComponent<Image>().sprite = C_5;
-			contSalud+=25;
 		}else{
 			if (contFelicidad <= 90 && contFelicidad >=65)
 			{
@@ -344,16 +310,15 @@ public class Change_States : MonoBehaviour {
 						if (contFelicidad < 10)
 						{
 							ic_Felicidad.GetComponent<Image>().sprite = C_1;
-							contSalud-=10;
 						}
 					} 
 				} 
 			}
 		} 
-		ChangeSalud();			
+		ChangeSpriteSalud();			
 	}	
 
-	void ChangeSalud()
+	void ChangeSpriteSalud()
 	{
 		if (contSalud>90)
 		{
@@ -388,22 +353,20 @@ public class Change_States : MonoBehaviour {
 		{
 			contComida--;
 		}
-		ChangeComida();
+		ChangeSpriteComida();
 		tempComida = promedioComida;
-		Debug.Log("Comida:" + contComida);
 		StartCoroutine(WaitComida());		
 	}
-	IEnumerator WaitBaño()
+	IEnumerator WaitAnimo()
 	{
-		yield return new WaitForSeconds(tempBaño);		
-		if (contBaño > 1)
+		yield return new WaitForSeconds(tempAnimo);		
+		if (contAnimo > 1)
 		{
-			contBaño--;
+			contAnimo--;
 		}
-		ChangeBaño();
-		tempBaño = promedioBaño;
-		Debug.Log("Baño:" + contBaño);
-		StartCoroutine(WaitBaño());		
+		ChangeSpriteAnimo();
+		tempAnimo = promedioAnimo;
+		StartCoroutine(WaitAnimo());		
 	}
 	IEnumerator WaitAseo()
 	{
@@ -412,68 +375,149 @@ public class Change_States : MonoBehaviour {
 		{
 			contAseo--;
 		}
-		ChangeAseo();
+		ChangeSpriteAseo();
 		tempAseo = promedioAseo;
-		Debug.Log("Aseo:" + contAseo);
 		StartCoroutine(WaitAseo());	
 	}
-	IEnumerator WaitSueño()
+
+	/*IEnumerator WaitSueño()
 	{
 		yield return new WaitForSeconds(tempSueño);		
 		if (contSueño > 1)
 		{
 			contSueño--;
 		}
-		ChangeSueño();
+		ChangeSpriteSueño();
 		tempSueño = promedioSueño;
-		Debug.Log("Sueño:" + contSueño);
 		StartCoroutine(WaitSueño());	
+	}*/
+
+	void AlertaError(string msg)
+    {
+		Debug.Log("CONTSUEÑO " + contSueño);
+		ChangeSpriteSueño();
+		txt_Alerta.GetComponent<Text>().text = msg;
+		Anim_Alert.SetTrigger("triggerPopUp");
 	}
 
 	public void Alimentar()
 	{
-		if (contComida!=5)
+		if (contSueño < 2)
+		{
+			AlertaError("¡Tu pettit está agotada!");
+			return;
+		}
+		if(contComida == 5)
+        {
+			AlertaError("¡Tu pettit ya está llena!");
+			return;
+		}
+
+		
+
+		if (TasteFood())
 		{
 			contComida = 5;
 			contFelicidad+=20;
-			LimitFelicidad();
-		}	
-		reFillComida();	
+			LikeAnimation(true);
+			HappinessUp(10);
+			Heal(5);			
+        }
+        else
+        {
+			LikeAnimation(false);
+			Heal(5);
+			contComida++;
+        }		
+
+		contSueño--;
+		
+		ChangeSpriteComida();
+		ChangeSpriteSueño();
+		ChangeSpriteFelicidad();
+		SaveMoment();
+		Alertar();
 	}
 
-	public void Limpiar()
+	void LikeAnimation(bool liked)
+    {
+		if (liked)
+        {
+			alertTaste.GetComponent<Image>().sprite = Resources.Load<Sprite>("CaraGusto");
+			Anim_AlertTaste.SetTrigger("triggerPopUp");
+        }
+        else
+        {
+			alertTaste.GetComponent<Image>().sprite = Resources.Load<Sprite>("CaraDisgusto");
+			Anim_AlertTaste.SetTrigger("triggerPopUp");
+		}
+    }
+
+	bool TasteFood()
+    {
+		if (PlayerPrefs.GetString("foodSelected") == PlayerPrefs.GetString("dietPet"))
+        {
+			return true;
+        }
+        else { return false; }		
+    }
+
+	public void Jugar()
 	{
-		if (contBaño!=5)
+		if (contSueño < 2)
 		{
-			contBaño = 5;
-			contFelicidad+=20;
-			LimitFelicidad();
-		}	
-		reFillBaño();
+			AlertaError("¡Tu pettit está agotada!");
+			return;
+		}
+		if (contAnimo!=5)
+		{
+			contAnimo++;
+			HappinessUp(10);
+		}
+
+		contSueño-= 2;
+
+		ChangeSpriteAnimo();
+		ChangeSpriteFelicidad();
+		ChangeSpriteSueño();
+		SaveMoment();		
+		Alertar();
 	}
 
 	public void Bañar()
 	{
+		if (contSueño < 2)
+		{
+			AlertaError("¡Tu pettit está agotada!");			
+			return;
+		}
+
 		if (contAseo!=5)
 		{
 			contAseo = 5;
-			contFelicidad+=20;
-			LimitFelicidad();
-		}	
-		reFillAseo();
+			HappinessUp(5);
+			Heal(5);
+		}
+
+		contSueño--;
+
+		ChangeSpriteAseo();
+		ChangeSpriteFelicidad();
+		ChangeSpriteSueño();
+		SaveMoment();		
+		Alertar();
 	}
 
-	public void Jugar()
-	{		
-		contFelicidad+=10;
-		contSueño-=1;
+	public void AumentarFelicidad()
+	{
+		HappinessUp(10);
+		contSueño -=1;
 		if(contSueño <= 0)
 		{
 			contSueño=1;
 		}
-		LimitFelicidad();
-		ChangeSueño();
-		ChangeFelicidad();
+		ChangeSpriteSueño();
+		ChangeSpriteFelicidad();
 	}
 
 	void LimitFelicidad()

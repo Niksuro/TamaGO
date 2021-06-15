@@ -11,11 +11,17 @@ public class swipeMenu : MonoBehaviour
 
     string[] names = new string[ ] { "Yui", "Yumi", "Kyu", "Kaiyu" };
     string[] specimen = new string[] { "Humanoide", "Gato estelar", "Humanoide", "Gato estelar" };
-    string[] description = new string[] { 
+    string[] description = new string[] 
+    { 
         "Descripcion extensa #1",
         "Descripcion extensa #2",
         "Descripcion extensa #3",
         "Descripcion extensa #4"
+    };
+    string[] diet = new string[]
+    {
+        "Frutal",
+        "Carnivoro"
     };
 
     float scroll_pos = 0;
@@ -35,6 +41,8 @@ public class swipeMenu : MonoBehaviour
     {
         PlayerPrefs.SetString("namePet", inputName.GetComponent<InputField>().text);
         PlayerPrefs.SetString("specimenPet", specimen[selection]);
+        PlayerPrefs.SetString("dietPet", diet[selection]);
+        PlayerPrefs.SetInt("selection", selection);        
         SceneManager.LoadScene("mainScene");
     }
 

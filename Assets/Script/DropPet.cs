@@ -8,7 +8,6 @@ public class DropPet : MonoBehaviour, IDropHandler
     Change_States CS;
     public void OnDrop(PointerEventData eventData)
     {
-        Debug.Log("ENTRO");
         CS = GameObject.Find("Scripts").GetComponent(typeof(Change_States)) as Change_States;
         CS.Alimentar();
     }

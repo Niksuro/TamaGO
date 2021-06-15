@@ -14,16 +14,16 @@ public class DragHandler : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
 
     void Start()
     {
-        dragParent = GameObject.FindGameObjectWithTag("Draggeable_Item").transform;
+        //dragParent = GameObject.FindGameObjectWithTag("Draggeable_Item").transform;        
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         itemDragging = gameObject;
-
+        PlayerPrefs.SetString("foodSelected", gameObject.tag);
         startPosition = transform.position;
         startParent = transform.parent;
-        transform.SetParent(dragParent);
+        //transform.SetParent(dragParent);
     }
     public void OnDrag(PointerEventData eventData)
     {
@@ -35,10 +35,10 @@ public class DragHandler : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
     {
         itemDragging = null;
         transform.position = startPosition;
-        if (transform.parent == dragParent)
+        /*if (transform.parent == dragParent)
         {
             transform.position = startPosition;
-            transform.SetParent(startParent);
-        }
+            transform.SetParent(startParent);            
+        }*/
     }
 }
